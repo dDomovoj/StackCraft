@@ -334,30 +334,30 @@ private extension VStackView {
 
 // MARK: - @resultBuilder Support
 
-extension VStackView {
+public extension VStackView {
 
   @resultBuilder
   struct Builder {
 
-    typealias Component = VStackViewItemConvertible
+    public typealias Component = VStackViewItemConvertible
 
-    static func buildBlock(_ components: Component...) -> [VStackViewItemConvertible] {
+    public static func buildBlock(_ components: Component...) -> [VStackViewItemConvertible] {
       components.flatMap { $0.items }
     }
 
-    static func buildOptional(_ component: [Component]?) -> [VStackViewItemConvertible] {
+    public static func buildOptional(_ component: [Component]?) -> [VStackViewItemConvertible] {
       component?.flatMap { $0.items } ?? []
     }
 
-    static func buildEither(first component: [Component]) -> [VStackViewItemConvertible] {
+    public static func buildEither(first component: [Component]) -> [VStackViewItemConvertible] {
       component.flatMap { $0.items }
     }
 
-    static func buildEither(second component: [Component]) -> [VStackViewItemConvertible] {
+    public static func buildEither(second component: [Component]) -> [VStackViewItemConvertible] {
       component.flatMap { $0.items }
     }
 
-    static func buildArray(_ components: [Component]) -> [VStackViewItemConvertible] {
+    public static func buildArray(_ components: [Component]) -> [VStackViewItemConvertible] {
       components.flatMap { $0.items }
     }
 
