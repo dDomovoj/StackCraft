@@ -7,13 +7,13 @@
 
 import UIKit
 
-extension UIView {
+public extension UIView {
 
   func asComponent() -> VStackView.Component { .init(self) }
 
 }
 
-extension CGFloat {
+public extension CGFloat {
 
   var fixedSpacing: VStackView.Spacing { .fixed(self) }
 
@@ -21,7 +21,7 @@ extension CGFloat {
 
 }
 
-extension Int {
+public extension Int {
 
   var fixedSpacing: VStackView.Spacing { .fixed(CGFloat(self)) }
 
@@ -29,7 +29,7 @@ extension Int {
 
 }
 
-protocol VStackViewItemConvertible {
+public protocol VStackViewItemConvertible {
 
   var items: [VStackViewItemConvertible] { get }
 
@@ -37,38 +37,38 @@ protocol VStackViewItemConvertible {
 
 extension Array: VStackViewItemConvertible where Element == VStackViewItemConvertible {
 
-  var items: [VStackViewItemConvertible] { self }
+  public var items: [VStackViewItemConvertible] { self }
 
 }
 
-class VStackView: View {
+public class VStackView: UIView {
 
-  var items: [VStackViewItemConvertible] = [] { didSet { setNeedsReload() } }
+  public var items: [VStackViewItemConvertible] = [] { didSet { setNeedsReload() } }
 
-  enum Value: Equatable {
+  public enum Value: Equatable {
     case fixed(CGFloat)
     case floating(CGFloat)
   }
 
-  enum Alignment {
+  public enum Alignment {
     case leading
     case center
     case trailing
   }
 
-  struct Spacing: Equatable, VStackViewItemConvertible {
+  public struct Spacing: Equatable, VStackViewItemConvertible {
 
     fileprivate let value: Value
 
-    var items: [VStackViewItemConvertible] { [self] }
+    public var items: [VStackViewItemConvertible] { [self] }
 
-    static func fixed(_ value: CGFloat) -> Spacing { .init(value: .fixed(value)) }
+    public static func fixed(_ value: CGFloat) -> Spacing { .init(value: .fixed(value)) }
 
-    static func floating(_ value: CGFloat) -> Spacing { .init(value: .floating(value)) }
+    public static func floating(_ value: CGFloat) -> Spacing { .init(value: .floating(value)) }
 
   }
 
-  struct Component: Equatable, VStackViewItemConvertible {
+  public struct Component: Equatable, VStackViewItemConvertible {
 
     let view: UIView
     fileprivate var preferredHeight: Value?
@@ -77,41 +77,41 @@ class VStackView: View {
     fileprivate var alignment: Alignment = .leading
     fileprivate var insets: UIEdgeInsets = .zero
 
-    var items: [VStackViewItemConvertible] { [self] }
+    public var items: [VStackViewItemConvertible] { [self] }
 
     // MARK: - Init
 
-    init(_ view: UIView) {
+    public init(_ view: UIView) {
       self.view = view
     }
 
     // MARK: - Public
 
-    func height(_ value: Value) -> Component {
+    public func height(_ value: Value) -> Component {
       var copy = self
       copy.preferredHeight = value
       return copy
     }
 
-    func width(_ value: CGFloat) -> Component {
+    public func width(_ value: CGFloat) -> Component {
       var copy = self
       copy.preferredWidth = value
       return copy
     }
 
-    func skipLayout() -> Component {
+    public func skipLayout() -> Component {
       var copy = self
       copy.shouldLayout = false
       return copy
     }
 
-    func alignment(_ value: Alignment) -> Component {
+    public func alignment(_ value: Alignment) -> Component {
       var copy = self
       copy.alignment = value
       return copy
     }
 
-    func insets(_ value: UIEdgeInsets) -> Component {
+    public func insets(_ value: UIEdgeInsets) -> Component {
       var copy = self
       copy.insets = value
       return copy
@@ -131,32 +131,46 @@ class VStackView: View {
     items.compactMap { $0 as? Spacing }
   }
 
-  override class var requiresConstraintBasedLayout: Bool { false }
+  public override class var requiresConstraintBasedLayout: Bool { false }
+
+  // MARK: - Init
+
+  override public init(frame: CGRect) {
+      super.init(frame: frame)
+      setup()
+  }
+
+  required public init?(coder aDecoder: NSCoder) {
+      super.init(coder: aDecoder)
+      setup()
+  }
 
   // MARK: - Lifecycle
 
-  override func setup() {
-    super.setup()
-    translatesAutoresizingMaskIntoConstraints = true
-  }
-
-  override func layoutSubviews() {
+  override public func layoutSubviews() {
     super.layoutSubviews()
     updateIfNeeded()
   }
 
   // MARK: - Public
 
-  func reload(@Builder builder: () -> [VStackViewItemConvertible]) -> Void {
+  public func setup() {
+    backgroundColor = .clear
+    translatesAutoresizingMaskIntoConstraints = true
+    setNeedsLayout()
+    setNeedsUpdateConstraints()
+  }
+
+  public func reload(@Builder builder: () -> [VStackViewItemConvertible]) -> Void {
     items = builder()
   }
 
-  func setNeedsReload() {
+  public func setNeedsReload() {
     needsReload = true
     setNeedsLayout()
   }
 
-  func spacing(before component: Component) -> CGFloat {
+  public func spacing(before component: Component) -> CGFloat {
     updateIfNeeded()
     guard let idx = items.firstIndex(where: { ($0 as? Component) == component }),
           idx - 1 < items.count - 1,
@@ -165,16 +179,16 @@ class VStackView: View {
     return transforms[idx - 1]
   }
 
-  func spacing(after component: Component) -> CGFloat {
+  public func spacing(after component: Component) -> CGFloat {
     updateIfNeeded()
     guard let idx = items.firstIndex(where: { ($0 as? Component) == component }),
           idx + 1 < items.count - 1,
-          items[safe: idx + 1] is Spacing else { return 0 }
+          items[idx + 1] is Spacing else { return 0 }
 
     return transforms[idx + 1]
   }
 
-  func height(of component: Component) -> CGFloat {
+  public func height(of component: Component) -> CGFloat {
     updateIfNeeded()
     guard let idx = items.firstIndex(where: { ($0 as? Component) == component }) else { return 0 }
 
@@ -201,7 +215,8 @@ private extension VStackView {
         subview.removeFromSuperview()
       }
     }
-    addSubviews(components.filter { $0.shouldLayout }.map(\.view))
+    components.filter { $0.shouldLayout }.map(\.view)
+      .forEach { addSubview($0) }
   }
 
   // swiftlint:disable:next cyclomatic_complexity
@@ -243,7 +258,7 @@ private extension VStackView {
     }
 
     let targetFloatingSpace = targetTotalFloatingHeight + targetTotalFloatingSpacing
-    let freeFloatingSpace = height - totalFixedHeight - totalFixedSpacing
+    let freeFloatingSpace = bounds.size.height - totalFixedHeight - totalFixedSpacing
     let floatingMultiplier = targetFloatingSpace != 0 ? (freeFloatingSpace / targetFloatingSpace) : 0
 
     transforms = [CGFloat](repeating: 0, count: items.count)
