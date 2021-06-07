@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name = 'StackCraft'
-    s.version = '0.0.3'
+    s.version = '0.0.4'
     s.summary = 'Stack views on frames library'
     s.swift_version = '5.4'
   
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
     s.framework = ["UIKit", "Foundation"]
   
     s.ios.deployment_target = '11.0'
-    s.source_files = 'Sources/*.swift'
+    s.source_files = 'Sources/StackCraft/*.swift'
   
   end
   
