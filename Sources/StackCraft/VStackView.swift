@@ -173,7 +173,7 @@ public class VStackView: UIView {
   public func spacing(before component: Component) -> CGFloat {
     updateIfNeeded()
     guard let idx = items.firstIndex(where: { ($0 as? Component) == component }),
-          idx - 1 < items.count - 1,
+          (0..<items.count).contains(idx - 1),
           items[idx - 1] is Spacing else { return 0 }
 
     return transforms[idx - 1]
@@ -182,7 +182,7 @@ public class VStackView: UIView {
   public func spacing(after component: Component) -> CGFloat {
     updateIfNeeded()
     guard let idx = items.firstIndex(where: { ($0 as? Component) == component }),
-          idx + 1 < items.count - 1,
+          (0..<items.count).contains(idx + 1),
           items[idx + 1] is Spacing else { return 0 }
 
     return transforms[idx + 1]
