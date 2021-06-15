@@ -214,7 +214,8 @@ private extension VStackView {
 
   func layout(component: Component, transform: CGFloat, accumulator: CGFloat) {
     if component.shouldLayout {
-      if let width = component.preferredWidth {
+      let width = component.preferredWidth ?? component.view.bounds.width
+      if width > 0 {
         switch component.alignment {
         case .leading:
           component.view.frame =
