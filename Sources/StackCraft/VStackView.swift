@@ -7,40 +7,6 @@
 
 import UIKit
 
-public extension UIView {
-
-  func asComponent() -> VStackView.Component { .init(self) }
-
-}
-
-public extension CGFloat {
-
-  var fixedSpacing: VStackView.Spacing { .fixed(self) }
-
-  var floatingSpacing: VStackView.Spacing { .floating(self) }
-
-}
-
-public extension Int {
-
-  var fixedSpacing: VStackView.Spacing { .fixed(CGFloat(self)) }
-
-  var floatingSpacing: VStackView.Spacing { .floating(CGFloat(self)) }
-
-}
-
-public protocol VStackViewItemConvertible {
-
-  var items: [VStackViewItemConvertible] { get }
-
-}
-
-extension Array: VStackViewItemConvertible where Element == VStackViewItemConvertible {
-
-  public var items: [VStackViewItemConvertible] { self }
-
-}
-
 public class VStackView: UIView {
 
   public var items: [VStackViewItemConvertible] = [] { didSet { setNeedsReload() } }
@@ -56,69 +22,7 @@ public class VStackView: UIView {
     case trailing
   }
 
-  public struct Spacing: Equatable, VStackViewItemConvertible {
-
-    fileprivate let value: Value
-
-    public var items: [VStackViewItemConvertible] { [self] }
-
-    public static func fixed(_ value: CGFloat) -> Spacing { .init(value: .fixed(value)) }
-
-    public static func floating(_ value: CGFloat) -> Spacing { .init(value: .floating(value)) }
-
-  }
-
-  public struct Component: Equatable, VStackViewItemConvertible {
-
-    let view: UIView
-    fileprivate var preferredHeight: Value?
-    fileprivate var preferredWidth: CGFloat?
-    fileprivate var shouldLayout: Bool = true
-    fileprivate var alignment: Alignment = .leading
-    fileprivate var insets: UIEdgeInsets = .zero
-
-    public var items: [VStackViewItemConvertible] { [self] }
-
-    // MARK: - Init
-
-    public init(_ view: UIView) {
-      self.view = view
-    }
-
-    // MARK: - Public
-
-    public func height(_ value: Value) -> Component {
-      var copy = self
-      copy.preferredHeight = value
-      return copy
-    }
-
-    public func width(_ value: CGFloat) -> Component {
-      var copy = self
-      copy.preferredWidth = value
-      return copy
-    }
-
-    public func skipLayout() -> Component {
-      var copy = self
-      copy.shouldLayout = false
-      return copy
-    }
-
-    public func alignment(_ value: Alignment) -> Component {
-      var copy = self
-      copy.alignment = value
-      return copy
-    }
-
-    public func insets(_ value: UIEdgeInsets) -> Component {
-      var copy = self
-      copy.insets = value
-      return copy
-    }
-
-  }
-
+  private var previousBounds: CGRect = .zero
   private var needsReload = true
   private var needsLayoutComponents = true
   private var transforms: [CGFloat] = []
@@ -137,6 +41,7 @@ public class VStackView: UIView {
 
   override public init(frame: CGRect) {
       super.init(frame: frame)
+      previousBounds = CGRect(origin: .zero, size: frame.size)
       setup()
   }
 
@@ -149,6 +54,11 @@ public class VStackView: UIView {
 
   override public func layoutSubviews() {
     super.layoutSubviews()
+    defer { previousBounds = bounds }
+    
+    if bounds != previousBounds {
+      needsLayoutComponents = true
+    }
     updateIfNeeded()
   }
 
@@ -330,36 +240,4 @@ private extension VStackView {
     }
   }
 
-}
-
-// MARK: - @resultBuilder Support
-
-public extension VStackView {
-
-  @resultBuilder
-  struct Builder {
-
-    public typealias Component = VStackViewItemConvertible
-
-    public static func buildBlock(_ components: Component...) -> [VStackViewItemConvertible] {
-      components.flatMap { $0.items }
-    }
-
-    public static func buildOptional(_ component: [Component]?) -> [VStackViewItemConvertible] {
-      component?.flatMap { $0.items } ?? []
-    }
-
-    public static func buildEither(first component: [Component]) -> [VStackViewItemConvertible] {
-      component.flatMap { $0.items }
-    }
-
-    public static func buildEither(second component: [Component]) -> [VStackViewItemConvertible] {
-      component.flatMap { $0.items }
-    }
-
-    public static func buildArray(_ components: [Component]) -> [VStackViewItemConvertible] {
-      components.flatMap { $0.items }
-    }
-
-  }
 }
