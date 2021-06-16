@@ -77,6 +77,7 @@ public class VStackView: UIView {
 
   public func setNeedsReload() {
     needsReload = true
+    needsLayoutComponents = true
     setNeedsLayout()
   }
 
