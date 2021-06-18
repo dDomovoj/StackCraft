@@ -55,7 +55,7 @@ public class VStackView: UIView {
   override public func layoutSubviews() {
     super.layoutSubviews()
     defer { previousBounds = bounds }
-    
+
     if bounds != previousBounds {
       needsLayoutComponents = true
     }
@@ -141,16 +141,20 @@ private extension VStackView {
       if $1.shouldLayout, $1.preferredHeight == nil {
         if let width = $1.preferredWidth {
           let widthToFit = width
+          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
+          let roundedSize = CGSize(width: size.width.rounded(.up), height: size.height.rounded(.up))
           var frame = $1.view.frame
-          frame.size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
+          frame.size = roundedSize
           $1.view.frame = frame
         }
         else {
-          var frame = $1.view.frame
-          frame.origin.x = $1.insets.left
+//          frame.origin.x = $1.insets.left
           let container = $1.view.superview?.bounds ?? .zero
           let widthToFit = max(container.width - $1.insets.left - $1.insets.right, 0)
-          frame.size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
+          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
+          let roundedSize = CGSize(width: size.width.rounded(.up), height: size.height.rounded(.up))
+          var frame = $1.view.frame
+          frame.size = roundedSize
           $1.view.frame = frame
         }
         $0 += $1.view.bounds.height
@@ -184,7 +188,7 @@ private extension VStackView {
             component.view.frame.size.height = height
           }
         case .floating(let targetHeight):
-          let height = floatingMultiplier * targetHeight
+          let height = (floatingMultiplier * targetHeight).rounded()
           transform = height
           if component.shouldLayout {
             component.view.frame.size.height = height
@@ -219,25 +223,27 @@ private extension VStackView {
       if width > 0 {
         switch component.alignment {
         case .leading:
+          let x = component.insets.left
           component.view.frame =
-            .init(x: component.insets.left, y: accumulator, width: width, height: transform)
+            .init(x: x.rounded(), y: accumulator, width: width, height: transform)
         case .trailing:
           let container = component.view.superview?.bounds ?? .zero
           let x = container.width - width - component.insets.right
           component.view.frame =
-            .init(x: x, y: accumulator, width: width, height: transform)
+            .init(x: x.rounded(), y: accumulator, width: width, height: transform)
         case .center:
           let container = component.view.superview?.bounds ?? .zero
           let x = (container.width - width) * 0.5 + (component.insets.left - component.insets.right)
           component.view.frame =
-            .init(x: x, y: accumulator, width: width, height: transform)
+            .init(x: x.rounded(), y: accumulator, width: width, height: transform)
         }
       }
       else {
         let container = component.view.superview?.bounds ?? .zero
         let width = container.width - component.insets.left - component.insets.right
+        let x = component.insets.left
         component.view.frame =
-          .init(x: component.insets.left, y: accumulator, width: width, height: transform)
+          .init(x: x.rounded(), y: accumulator, width: width, height: transform)
       }
     }
   }
