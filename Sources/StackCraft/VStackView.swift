@@ -139,20 +139,27 @@ private extension VStackView {
     let totalFixedHeight = components.reduce(into: CGFloat(0)) {
       if case .fixed(let height) = $1.preferredHeight { $0 += height }
       if $1.shouldLayout, $1.preferredHeight == nil {
-        if let width = $1.preferredWidth {
+        switch $1.preferredWidth {
+        case .fixed(let width):
           let widthToFit = width
+          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
+          let roundedSize = CGSize(width: width, height: size.height.rounded(.up))
+          var frame = $1.view.frame
+          frame.size = roundedSize
+          $1.view.frame = frame
+        case .fit:
+          let container = $1.view.superview?.bounds ?? .zero
+          let widthToFit = max(container.width - $1.insets.left - $1.insets.right, 0)
           let size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
           let roundedSize = CGSize(width: size.width.rounded(.up), height: size.height.rounded(.up))
           var frame = $1.view.frame
           frame.size = roundedSize
           $1.view.frame = frame
-        }
-        else {
-//          frame.origin.x = $1.insets.left
+        case .fill:
           let container = $1.view.superview?.bounds ?? .zero
           let widthToFit = max(container.width - $1.insets.left - $1.insets.right, 0)
           let size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
-          let roundedSize = CGSize(width: size.width.rounded(.up), height: size.height.rounded(.up))
+          let roundedSize = CGSize(width: widthToFit, height: size.height.rounded(.up))
           var frame = $1.view.frame
           frame.size = roundedSize
           $1.view.frame = frame
@@ -219,7 +226,12 @@ private extension VStackView {
 
   func layout(component: Component, transform: CGFloat, accumulator: CGFloat) {
     if component.shouldLayout {
-      let width = component.preferredWidth ?? component.view.bounds.width
+      let width: CGFloat
+      if case .fixed(let value) = component.preferredWidth {
+        width = value
+      } else {
+        width = component.view.bounds.width
+      }
       if width > 0 {
         switch component.alignment {
         case .leading:

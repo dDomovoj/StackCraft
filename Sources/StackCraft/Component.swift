@@ -11,8 +11,14 @@ public extension VStackView {
 
   struct Component: Equatable, VStackViewItemConvertible {
 
+    public enum Width: Equatable {
+      case fit
+      case fill
+      case fixed(CGFloat)
+    }
+
     internal var preferredHeight: Value?
-    internal var preferredWidth: CGFloat?
+    internal var preferredWidth: Width = .fill
     internal var shouldLayout: Bool = true
     internal var alignment: Alignment = .leading
     internal var insets: UIEdgeInsets = .zero
@@ -34,7 +40,7 @@ public extension VStackView {
       return copy
     }
 
-    public func width(_ value: CGFloat) -> Component {
+    public func width(_ value: Width) -> Component {
       var copy = self
       copy.preferredWidth = value
       return copy
