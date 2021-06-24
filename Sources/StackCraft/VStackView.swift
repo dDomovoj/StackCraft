@@ -219,7 +219,7 @@ private extension VStackView {
         transform = 0
       }
 
-      accumulator += transform
+      accumulator += (transform * 2.0).rounded(.up) / 2.0
       transforms[idx] = transform
     }
   }
