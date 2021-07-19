@@ -1,7 +1,6 @@
 //
 //  Component.swift
 //
-//  Created by Dzmitry Duleba on 6/06/21.
 //  Copyright © 2021 dDomovoj. All rights reserved.
 //
 
@@ -66,3 +65,64 @@ public extension VStackView {
 
   }
 }
+
+public extension HStackView {
+
+  struct Component: Equatable, HStackViewItemConvertible {
+
+    public enum Height: Equatable {
+      case fit
+      case fill
+      case fixed(CGFloat)
+    }
+
+    internal var preferredWidth: Value?
+    internal var preferredHeight: Height = .fill
+    internal var shouldLayout: Bool = true
+    internal var alignment: Alignment = .top
+    internal var insets: UIEdgeInsets = .zero
+
+    public let view: UIView
+    public var items: [HStackViewItemConvertible] { [self] }
+
+    // MARK: - Init
+
+    public init(_ view: UIView) {
+      self.view = view
+    }
+
+    // MARK: - Public
+
+    public func width(_ value: Value) -> Component {
+      var copy = self
+      copy.preferredWidth = value
+      return copy
+    }
+
+    public func height(_ value: Height) -> Component {
+      var copy = self
+      copy.preferredHeight = value
+      return copy
+    }
+
+    public func skipLayout() -> Component {
+      var copy = self
+      copy.shouldLayout = false
+      return copy
+    }
+
+    public func alignment(_ value: Alignment) -> Component {
+      var copy = self
+      copy.alignment = value
+      return copy
+    }
+
+    public func insets(_ value: UIEdgeInsets) -> Component {
+      var copy = self
+      copy.insets = value
+      return copy
+    }
+
+  }
+}
+
