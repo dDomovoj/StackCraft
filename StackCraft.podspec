@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name = 'StackCraft'
-    s.version = '0.2.0'
+    s.version = '0.2.1'
     s.summary = 'Stack views on frames library'
     s.swift_version = '5.4'
   
