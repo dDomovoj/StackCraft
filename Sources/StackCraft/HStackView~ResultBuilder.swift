@@ -14,23 +14,23 @@ public extension HStackView {
     public typealias Component = HStackViewItemConvertible
 
     public static func buildBlock(_ components: Component...) -> [HStackViewItemConvertible] {
-      components.flatMap { $0.items }
+      components.flatMap { $0.hItems }
     }
 
     public static func buildOptional(_ component: [Component]?) -> [HStackViewItemConvertible] {
-      component?.flatMap { $0.items } ?? []
+      component?.flatMap { $0.hItems } ?? []
     }
 
     public static func buildEither(first component: [Component]) -> [HStackViewItemConvertible] {
-      component.flatMap { $0.items }
+      component.flatMap { $0.hItems }
     }
 
     public static func buildEither(second component: [Component]) -> [HStackViewItemConvertible] {
-      component.flatMap { $0.items }
+      component.flatMap { $0.hItems }
     }
 
     public static func buildArray(_ components: [Component]) -> [HStackViewItemConvertible] {
-      components.flatMap { $0.items }
+      components.flatMap { $0.hItems }
     }
 
   }

@@ -14,23 +14,23 @@ public extension VStackView {
     public typealias Component = VStackViewItemConvertible
 
     public static func buildBlock(_ components: Component...) -> [VStackViewItemConvertible] {
-      components.flatMap { $0.items }
+      components.flatMap { $0.vItems }
     }
 
     public static func buildOptional(_ component: [Component]?) -> [VStackViewItemConvertible] {
-      component?.flatMap { $0.items } ?? []
+      component?.flatMap { $0.vItems } ?? []
     }
 
     public static func buildEither(first component: [Component]) -> [VStackViewItemConvertible] {
-      component.flatMap { $0.items }
+      component.flatMap { $0.vItems }
     }
 
     public static func buildEither(second component: [Component]) -> [VStackViewItemConvertible] {
-      component.flatMap { $0.items }
+      component.flatMap { $0.vItems }
     }
 
     public static func buildArray(_ components: [Component]) -> [VStackViewItemConvertible] {
-      components.flatMap { $0.items }
+      components.flatMap { $0.vItems }
     }
 
   }

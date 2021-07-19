@@ -8,13 +8,13 @@ import Foundation
 
 public protocol HStackViewItemConvertible {
 
-  var items: [HStackViewItemConvertible] { get }
+  var hItems: [HStackViewItemConvertible] { get }
 
 }
 
 extension Array: HStackViewItemConvertible where Element == HStackViewItemConvertible {
 
-  public var items: [HStackViewItemConvertible] { self }
+  public var hItems: [HStackViewItemConvertible] { self }
 
 }
 

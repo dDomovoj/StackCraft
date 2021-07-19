@@ -23,7 +23,7 @@ public extension VStackView {
     internal var insets: UIEdgeInsets = .zero
 
     public let view: UIView
-    public var items: [VStackViewItemConvertible] { [self] }
+    public var vItems: [VStackViewItemConvertible] { [self] }
 
     // MARK: - Init
 
@@ -83,7 +83,7 @@ public extension HStackView {
     internal var insets: UIEdgeInsets = .zero
 
     public let view: UIView
-    public var items: [HStackViewItemConvertible] { [self] }
+    public var hItems: [HStackViewItemConvertible] { [self] }
 
     // MARK: - Init
 

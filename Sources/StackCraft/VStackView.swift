@@ -11,11 +11,6 @@ public class VStackView: UIView {
 
   public var items: [VStackViewItemConvertible] = [] { didSet { setNeedsReload() } }
 
-  public enum Value: Equatable {
-    case fixed(CGFloat)
-    case floating(CGFloat)
-  }
-
   public enum Alignment {
     case leading
     case center

@@ -10,11 +10,6 @@ public class HStackView: UIView {
 
   public var items: [HStackViewItemConvertible] = [] { didSet { setNeedsReload() } }
 
-  public enum Value: Equatable {
-    case fixed(CGFloat)
-    case floating(CGFloat)
-  }
-
   public enum Alignment {
     case top
     case center

@@ -6,108 +6,26 @@
 
 import UIKit
 
-// MARK: - Vertical
-
-public struct StackViewVertical<T> {
-
-  public typealias Base = T
-
-  let base: T
-
-  init(_ base: T) { self.base = base }
-
-}
-
 public extension UIView {
 
-  var vertical: StackViewVertical<UIView> { .init(self) }
+  var vComponent: VStackView.Component { .init(self) }
 
-}
-
-public extension CGFloat {
-
-  var vertical: StackViewVertical<CGFloat> { .init(self) }
+  var hComponent: VStackView.Component { .init(self) }
 
 }
 
 public extension Int {
 
-  var vertical: StackViewVertical<Int> { .init(self) }
+  var fixed: Spacing { .fixed(CGFloat(self)) }
 
-}
-
-public extension StackViewVertical where Base == UIView {
-
-  var component: VStackView.Component { .init(base) }
-
-}
-
-public extension StackViewVertical where Base == Int {
-
-  var fixed: VStackView.Spacing { .fixed(CGFloat(base)) }
-
-  var floating: VStackView.Spacing { .floating(CGFloat(base)) }
-
-}
-
-public extension StackViewVertical where Base == CGFloat {
-
-  var fixed: VStackView.Spacing { .fixed(base) }
-
-  var floating: VStackView.Spacing { .floating(base) }
-
-}
-
-
-// MARK: - Horizontal
-
-
-public struct StackViewHorizontal<T> {
-
-  public typealias Base = T
-
-  let base: T
-
-  init(_ base: T) { self.base = base }
-
-}
-
-public extension UIView {
-
-  var horizontal: StackViewHorizontal<UIView> { .init(self) }
+  var floating: Spacing { .floating(CGFloat(self)) }
 
 }
 
 public extension CGFloat {
 
-  var horizontal: StackViewHorizontal<CGFloat> { .init(self) }
+  var fixed: Spacing { .fixed(self) }
 
-}
-
-public extension Int {
-
-  var horizontal: StackViewHorizontal<Int> { .init(self) }
-
-}
-
-public extension StackViewHorizontal where Base == UIView {
-
-  var component: HStackView.Component { .init(base) }
-
-}
-
-public extension StackViewHorizontal where Base == Int {
-
-  var fixed: HStackView.Spacing { .fixed(CGFloat(base)) }
-
-  var floating: HStackView.Spacing { .floating(CGFloat(base)) }
-
-}
-
-public extension StackViewHorizontal where Base == CGFloat {
-
-  var fixed: HStackView.Spacing { .fixed(base) }
-
-  var floating: HStackView.Spacing { .floating(base) }
+  var floating: Spacing { .floating(self) }
 
 }
