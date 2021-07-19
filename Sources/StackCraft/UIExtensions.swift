@@ -64,7 +64,7 @@ public extension StackViewVertical where Base == CGFloat {
 
 public struct StackViewHorizontal<T> {
 
-  typealias Base = T
+  public typealias Base = T
 
   let base: T
 
