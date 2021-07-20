@@ -10,7 +10,7 @@ public extension UIView {
 
   var vComponent: VStackView.Component { .init(self) }
 
-  var hComponent: VStackView.Component { .init(self) }
+  var hComponent: HStackView.Component { .init(self) }
 
 }
 
