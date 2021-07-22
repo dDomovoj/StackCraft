@@ -45,6 +45,13 @@ public extension VStackView {
       return copy
     }
 
+    public func size(_ value: CGSize) -> Component {
+      var copy = self
+      copy.preferredWidth = .fixed(value.width)
+      copy.preferredHeight = .fixed(value.height)
+      return copy
+    }
+
     public func skipLayout() -> Component {
       var copy = self
       copy.shouldLayout = false
@@ -102,6 +109,13 @@ public extension HStackView {
     public func height(_ value: Height) -> Component {
       var copy = self
       copy.preferredHeight = value
+      return copy
+    }
+
+    public func size(_ value: CGSize) -> Component {
+      var copy = self
+      copy.preferredWidth = .fixed(value.width)
+      copy.preferredHeight = .fixed(value.height)
       return copy
     }
 
