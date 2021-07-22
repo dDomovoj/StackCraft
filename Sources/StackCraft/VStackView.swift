@@ -132,33 +132,32 @@ private extension VStackView {
 
     let components = self.components()
     let totalFixedHeight = components.reduce(into: CGFloat(0)) {
-      if case .fixed(let height) = $1.preferredHeight { $0 += height }
+      let maxHeight = $1.maxHeight
+      if case .fixed(let height) = $1.preferredHeight {
+        $0 += min(height, maxHeight)
+      }
       if $1.shouldLayout, $1.preferredHeight == nil {
+        let calculatedSize: CGSize
         switch $1.preferredWidth {
         case .fixed(let width):
           let widthToFit = width
-          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
-          let roundedSize = CGSize(width: width, height: size.height.rounded(.up))
-          var frame = $1.view.frame
-          frame.size = roundedSize
-          $1.view.frame = frame
+          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: maxHeight))
+          calculatedSize = CGSize(width: width, height: size.height.rounded(.up))
         case .fit:
           let container = $1.view.superview?.bounds ?? .zero
           let widthToFit = max(container.width - $1.insets.left - $1.insets.right, 0)
-          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
-          let roundedSize = CGSize(width: size.width.rounded(.up), height: size.height.rounded(.up))
-          var frame = $1.view.frame
-          frame.size = roundedSize
-          $1.view.frame = frame
+          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: maxHeight))
+          calculatedSize = CGSize(width: size.width.rounded(.up), height: size.height.rounded(.up))
         case .fill:
           let container = $1.view.superview?.bounds ?? .zero
           let widthToFit = max(container.width - $1.insets.left - $1.insets.right, 0)
-          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: .greatestFiniteMagnitude))
-          let roundedSize = CGSize(width: widthToFit, height: size.height.rounded(.up))
-          var frame = $1.view.frame
-          frame.size = roundedSize
-          $1.view.frame = frame
+          let size = $1.view.sizeThatFits(.init(width: widthToFit, height: maxHeight))
+          calculatedSize = CGSize(width: widthToFit, height: size.height.rounded(.up))
         }
+        var frame = $1.view.frame
+        frame.size = calculatedSize
+        frame.size.height = min(frame.size.height, maxHeight)
+        $1.view.frame = frame
         $0 += $1.view.bounds.height
       }
     }
@@ -183,23 +182,27 @@ private extension VStackView {
     items.enumerated().forEach { idx, item in
       let transform: CGFloat
       if let component = item as? Component {
+        let maxHeight = component.maxHeight
         switch component.preferredHeight {
         case .fixed(let height):
+          let height = min(maxHeight, height)
           transform = height
           if component.shouldLayout {
             component.view.frame.size.height = height
           }
         case .floating(let targetHeight):
-          let height = (floatingMultiplier * targetHeight).rounded()
+          let height = min(max((floatingMultiplier * targetHeight).rounded(), 0), maxHeight)
           transform = height
           if component.shouldLayout {
             component.view.frame.size.height = height
           }
         case .none:
-          transform = component.shouldLayout ? component.view.bounds.height : 0
+          transform = component.shouldLayout
+            ? min(maxHeight, component.view.bounds.height)
+            : 0
         }
 
-        layout(component: component, transform: transform, accumulator: accumulator)
+        layout(component: component, height: transform, accumulator: accumulator)
       }
       else if let spacing = item as? Spacing {
         switch spacing.value {
@@ -219,39 +222,39 @@ private extension VStackView {
     }
   }
 
-  func layout(component: Component, transform: CGFloat, accumulator: CGFloat) {
-    if component.shouldLayout {
-      let width: CGFloat
-      if case .fixed(let value) = component.preferredWidth {
-        width = value
-      } else {
-        width = component.view.bounds.width
-      }
-      if width > 0 {
-        switch component.alignment {
-        case .leading:
-          let x = component.insets.left
-          component.view.frame =
-            .init(x: x.rounded(), y: accumulator, width: width, height: transform)
-        case .trailing:
-          let container = component.view.superview?.bounds ?? .zero
-          let x = container.width - width - component.insets.right
-          component.view.frame =
-            .init(x: x.rounded(), y: accumulator, width: width, height: transform)
-        case .center:
-          let container = component.view.superview?.bounds ?? .zero
-          let x = (container.width - width) * 0.5 + (component.insets.left - component.insets.right)
-          component.view.frame =
-            .init(x: x.rounded(), y: accumulator, width: width, height: transform)
-        }
-      }
-      else {
-        let container = component.view.superview?.bounds ?? .zero
-        let width = container.width - component.insets.left - component.insets.right
+  func layout(component: Component, height: CGFloat, accumulator: CGFloat) {
+    guard component.shouldLayout else { return }
+
+    let width: CGFloat
+    if case .fixed(let value) = component.preferredWidth {
+      width = value
+    } else {
+      width = component.view.bounds.width
+    }
+    if width > 0 {
+      switch component.alignment {
+      case .leading:
         let x = component.insets.left
         component.view.frame =
-          .init(x: x.rounded(), y: accumulator, width: width, height: transform)
+          .init(x: x.rounded(), y: accumulator, width: width, height: height)
+      case .trailing:
+        let container = component.view.superview?.bounds ?? .zero
+        let x = container.width - width - component.insets.right
+        component.view.frame =
+          .init(x: x.rounded(), y: accumulator, width: width, height: height)
+      case .center:
+        let container = component.view.superview?.bounds ?? .zero
+        let x = (container.width - width) * 0.5 + (component.insets.left - component.insets.right)
+        component.view.frame =
+          .init(x: x.rounded(), y: accumulator, width: width, height: height)
       }
+    }
+    else {
+      let container = component.view.superview?.bounds ?? .zero
+      let width = container.width - component.insets.left - component.insets.right
+      let x = component.insets.left
+      component.view.frame =
+        .init(x: x.rounded(), y: accumulator, width: width, height: height)
     }
   }
 

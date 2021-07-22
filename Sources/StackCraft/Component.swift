@@ -17,6 +17,12 @@ public extension VStackView {
     }
 
     internal var preferredHeight: Value?
+    private var _maxHeight: CGFloat?
+    internal var maxHeight: CGFloat {
+      guard let value = _maxHeight else { return .greatestFiniteMagnitude }
+
+      return max(0, value.rounded(.up))
+    }
     internal var preferredWidth: Width = .fill
     internal var shouldLayout: Bool = true
     internal var alignment: Alignment = .leading
@@ -36,6 +42,12 @@ public extension VStackView {
     public func height(_ value: Value) -> Component {
       var copy = self
       copy.preferredHeight = value
+      return copy
+    }
+
+    public func maxHeight(_ value: CGFloat) -> Component {
+      var copy = self
+      copy._maxHeight = value
       return copy
     }
 
